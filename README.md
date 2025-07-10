@@ -32,6 +32,12 @@ It supports **semantic diff** for structured formats (like `JSON` and `INI`) and
 ```bash
 git clone https://github.com/andreanegri/diffinity.git
 cd diffinity
+
+python -m venv .venv
+source .venv/bin/activate
+
+pip install --upgrade setuptools pip
+
 pip install -e .
 ```
 
