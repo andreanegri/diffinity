@@ -1,0 +1,16 @@
+[project]
+name = "diffinity"
+version = "0.1.0"
+description = "The divine art of comparing configuration files."
+authors = [{ name = "Andrea Negri", email = "a.negri@cineca.it" }]
+requires-python = ">=3.8"
+dependencies = [
+    "rich>=14.0.0",
+]
+
+[project.scripts]
+diffinity = "diffinity.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
