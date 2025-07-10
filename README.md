@@ -1,6 +1,6 @@
 # DIFFINITY
 
-![diffinity-logo](shared/images/logo400.png)  
+![diffinity-logo](diffinity/resources/images/logo400.png)  
 *A CLI tool for deep, nerd-grade diffing of configuration files.*
 
 ---
