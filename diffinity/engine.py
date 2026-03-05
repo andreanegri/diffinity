@@ -126,21 +126,17 @@ def _print_sidebyside(diff_lines, relpath_display):
     table.add_column("OLD", header_style="bold red", ratio=1)
     table.add_column("NEW", header_style="bold green", ratio=1)
 
-    PLACEHOLDER = Text("~~~", style="dim")
-
     for line in diff_lines:
         if line.startswith("---") or line.startswith("+++"):
             continue
         elif line.startswith("@@"):
-            hunk_text = Text(line, style="magenta")
-            table.add_row(hunk_text, hunk_text)
+            table.add_row(Text(line, style="magenta"), Text(line, style="magenta"))
         elif line.startswith("-"):
-            table.add_row(Text(line, style="red"), PLACEHOLDER)
+            table.add_row(Text(line, style="red"), Text("~~~", style="dim"))
         elif line.startswith("+"):
-            table.add_row(PLACEHOLDER, Text(line, style="green"))
+            table.add_row(Text("~~~", style="dim"), Text(line, style="green"))
         else:
-            ctx = Text(line, style="dim")
-            table.add_row(ctx, ctx)
+            table.add_row(Text(line, style="dim"), Text(line, style="dim"))
 
     console.print(table)
     console.print()
