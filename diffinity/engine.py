@@ -1,36 +1,33 @@
 import os
-from .fileio import load_text, parse_file
+from .fileio import parse_file
 from .report import export_report
 from rich.console import Console
 from rich.text import Text
+from rich.table import Table
+from rich.rule import Rule
+import rich.box
 
 console = Console()
 
 def run_diff(
     dir1, dir2,
-    includelist_path=None,
+    includelist=None,
     output_file=None,
-    style="compact",
+    style="sidebyside",
     ignore_paths=False,
-    includepatterns_path=None
+    includepatterns=None
 ):
-    # Costruzione lista (relpath1, relpath2) da confrontare
-    if includelist_path:
-        files = [(line.strip(), line.strip()) for line in load_text(includelist_path).splitlines() if line.strip()]
-    elif includepatterns_path:
-        suffixes = []
-        for line in load_text(includepatterns_path).splitlines():
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            line = line.split("#", 1)[0].strip()  # remove inline comment
-            if line:
-                suffixes.append(line)
+    # Build list of (relpath1, relpath2) pairs to compare
+    if includelist:
+        files = [(entry.strip(), entry.strip()) for entry in includelist if entry.strip()]
+    elif includepatterns:
         base1 = os.path.basename(os.path.normpath(dir1))
         base2 = os.path.basename(os.path.normpath(dir2))
         files = []
-
-        for raw in suffixes:
+        for raw in includepatterns:
+            raw = raw.strip()
+            if not raw:
+                continue
             subdir, _, suffix = raw.rpartition("/")
             file1 = f"{base1}{suffix}"
             file2 = f"{base2}{suffix}"
@@ -38,7 +35,7 @@ def run_diff(
             relpath2 = os.path.join(subdir, file2) if subdir else file2
             files.append((relpath1, relpath2))
     else:
-        raise ValueError("È necessario specificare --includelist o --includepatterns")
+        raise ValueError("Either --includelist or --includepatterns must be specified")
 
     results = []
 
@@ -49,12 +46,12 @@ def run_diff(
         relpath_display = relpath1 if relpath1 == relpath2 else f"{relpath1} ↔ {relpath2}"
 
         if not os.path.exists(path1):
-            msg = f"[MISSING] {relpath1} non trovato in {dir1}/"
+            msg = f"[MISSING] {relpath1} not found in {dir1}/"
             _print_missing(msg, style)
             results.append(msg)
             continue
         if not os.path.exists(path2):
-            msg = f"[MISSING] {relpath2} non trovato in {dir2}/"
+            msg = f"[MISSING] {relpath2} not found in {dir2}/"
             _print_missing(msg, style)
             results.append(msg)
             continue
@@ -62,25 +59,31 @@ def run_diff(
         diff_lines = list(parse_file(path1, path2, ignore_paths))
 
         if any(line.startswith(("+", "-")) for line in diff_lines):
-            _print_header(relpath_display, style)
-            results.append(f"=== {relpath_display} ===" if style == "verbose" else f"▶ {relpath_display}")
-            for line in diff_lines:
-                if style == "compact" and not line.startswith(("+", "-")):
-                    continue
-                _print_line(line, style)
-                results.append(line)
-            if style == "compact":
-                console.print()
-                results.append("")
+            results.append(f"▶ {relpath_display}" if style != "verbose" else f"=== {relpath_display} ===")
+
+            if style == "sidebyside":
+                for line in diff_lines:
+                    results.append(line)
+                _print_sidebyside(diff_lines, relpath_display)
+            else:
+                _print_header(relpath_display, style)
+                for line in diff_lines:
+                    if style == "compact" and not line.startswith(("+", "-")):
+                        continue
+                    _print_line(line, style)
+                    results.append(line)
+                if style == "compact":
+                    console.print()
+                    results.append("")
         else:
-            msg = f"✓ {relpath_display} (nessuna differenza)"
+            msg = f"✓ {relpath_display} (no differences)"
             console.print(Text(msg, style="dim"))
             results.append(msg)
 
     if output_file:
         export_report(results, output_file)
 
-# === Stampa CLI ===
+# === CLI output ===
 
 def _print_header(relpath, style):
     if style == "compact":
@@ -109,3 +112,35 @@ def _print_missing(msg, style):
     if style == "compact":
         msg = msg.replace("[MISSING]", "⚠")
     console.print(Text(msg, style="bold yellow"))
+
+def _print_sidebyside(diff_lines, relpath_display):
+    console.print(Rule(title=f"[bold cyan]{relpath_display}[/bold cyan]", style="cyan"))
+
+    table = Table(
+        box=rich.box.SIMPLE_HEAVY,
+        show_header=True,
+        header_style="bold",
+        expand=True,
+        padding=(0, 1),
+    )
+    table.add_column("OLD", header_style="bold red", ratio=1)
+    table.add_column("NEW", header_style="bold green", ratio=1)
+
+    PLACEHOLDER = Text("~~~", style="dim")
+
+    for line in diff_lines:
+        if line.startswith("---") or line.startswith("+++"):
+            continue
+        elif line.startswith("@@"):
+            hunk_text = Text(line, style="magenta")
+            table.add_row(hunk_text, hunk_text)
+        elif line.startswith("-"):
+            table.add_row(Text(line, style="red"), PLACEHOLDER)
+        elif line.startswith("+"):
+            table.add_row(PLACEHOLDER, Text(line, style="green"))
+        else:
+            ctx = Text(line, style="dim")
+            table.add_row(ctx, ctx)
+
+    console.print(table)
+    console.print()
