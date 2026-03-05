@@ -3,16 +3,16 @@ from .engine import run_diff
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Diffinity: the divine art of config comparison.")
-    parser.add_argument("dir1", help="Prima directory")
-    parser.add_argument("dir2", help="Seconda directory")
+    parser.add_argument("dir1", help="First directory")
+    parser.add_argument("dir2", help="Second directory")
 
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--includelist", help="File con lista completa di path relativi da confrontare")
-    group.add_argument("--includepatterns", help="File con lista di suffissi da combinare con il nome della dir")
-    
-    parser.add_argument("--output", help="File di output (.txt o .html)")
-    parser.add_argument("--style", choices=["compact", "verbose"], default="compact", help="Stile di output CLI")
-    parser.add_argument("--ignore-paths", action="store_true", help="Ignora i path nei contenuti dei file")
+    group.add_argument("--includelist", nargs="+", help="Relative file paths to compare")
+    group.add_argument("--includepatterns", nargs="+", help="Suffix patterns combined with each directory basename to locate files")
+
+    parser.add_argument("--output", help="Output file (.txt or .html)")
+    parser.add_argument("--style", choices=["sidebyside", "compact", "verbose"], default="sidebyside", help="Output verbosity")
+    parser.add_argument("--ignore-paths", action="store_true", help="Ignore filesystem paths in file contents")
 
     return parser.parse_args()
 
