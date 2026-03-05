@@ -5,7 +5,7 @@
 
 ---
 
-**Current version**: `0.1.0`
+Current version: `0.2.0`
 
 **Diffinity** is a command-line utility designed to compare configuration files across multiple application runs.  
 It supports **semantic diff** for structured formats (like `JSON` and `INI`) and **textual diff** for custom text-based files.
