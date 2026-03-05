@@ -1,0 +1,4 @@
+# this is a comment
+_config.json
+_settings.ini
+subdir/_notes.txt
