@@ -109,7 +109,7 @@ def _print_line(line, style):
             console.print(line)
 
 def _print_missing(msg, style):
-    if style == "compact":
+    if style in ("compact", "sidebyside"):
         msg = msg.replace("[MISSING]", "⚠")
     console.print(Text(msg, style="bold yellow"))
 
