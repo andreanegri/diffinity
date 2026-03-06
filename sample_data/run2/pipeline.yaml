@@ -1,0 +1,33 @@
+name: training-pipeline-v2
+version: "1.1"
+
+stages:
+  - name: preprocess
+    image: preproc:2.1
+    params:
+      resize: [224, 224]
+      normalize: true
+      augment: true
+
+  - name: train
+    image: trainer:3.5
+    params:
+      device: cuda
+      mixed_precision: true
+      grad_clip: 0.5
+
+  - name: evaluate
+    image: evaluator:1.2
+    params:
+      metrics: [accuracy, f1, auc]
+      threshold: 0.5
+
+  - name: export
+    image: exporter:1.0
+    params:
+      format: onnx
+      optimize: true
+
+notifications:
+  on_failure: ops-team@example.com
+  on_success: ml-team@example.com

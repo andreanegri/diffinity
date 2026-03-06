@@ -1,0 +1,7 @@
+{
+  "learning_rate": 0.0005,
+  "batch_size": 64,
+  "weight_decay": 0.00005,
+  "lr_scheduler": "step",
+  "warmup_steps": 1000
+}

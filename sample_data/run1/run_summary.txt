@@ -1,0 +1,25 @@
+Run ID:        run-20240301-001
+Started:       2024-03-01 08:12:34 UTC
+Finished:      2024-03-01 11:47:22 UTC
+Duration:      3h 34m 48s
+Status:        COMPLETED
+
+Model:         resnet50
+Dataset:       imagenet-subset-10k
+Epochs:        20 / 20
+
+Results:
+  Train loss:      0.2341
+  Val loss:        0.3102
+  Accuracy:        81.4%
+  F1 Score:        0.799
+  AUC-ROC:         0.871
+
+Artifacts:
+  Best checkpoint: /data/experiments/run1/checkpoints/epoch_18.pt
+  Final model:     /data/experiments/run1/outputs/model_final.pt
+  Metrics log:     /data/experiments/run1/outputs/metrics.csv
+
+Notes:
+  - Validation loss plateaued after epoch 15
+  - No augmentation applied in this run

@@ -1,0 +1,12 @@
+{
+  "use_gpu": true,
+  "seed": 42,
+  "optimizer": "sgd",
+  "model": "resnet101",
+  "epochs": 30,
+  "dropout": 0.5,
+  "learning_rate": 0.0005,
+  "batch_size": 64,
+  "output_dir": "/data/experiments/run2/outputs",
+  "checkpoint_path": "/data/experiments/run2/checkpoints"
+}
